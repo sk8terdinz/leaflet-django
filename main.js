@@ -315,6 +315,40 @@ function init(){
 
     // Function to add GeoJSON to the map
     function addGeoJSONData(data, layername){
+        // let polyPane = mymap.createPane('Poly')
+        // let routePane = mymap.createPane('Route')
+        // let pointPane = mymap.createPane('POIs')
+        // let geoJSONLayer;
+
+        // switch (layername){
+        //     case 'Cibinong Route':
+        //         mymap.getPane('Route').style.zIndex = 401
+        //         geoJSONLayer = L.geoJSON(data,{
+        //             pane: 'Route',
+        //             style: {color: 'orange', fillOpacity: 1}
+        //         }).addTo(mymap);
+        //         break;
+
+        //     case 'Cibinong Lake':
+        //         mymap.getPane('Poly').style.zIndex = 400
+        //         geoJSONLayer = L.geoJSON(data,{
+        //             pane: 'Poly',
+        //             style: {color: 'blue', fillOpacity: 1}
+        //         }).addTo(mymap);
+        //         break;
+
+        //     case 'POIb':
+        //         mymap.getPane('POIs').style.zIndex = 402
+        //         geoJSONLayer = L.geoJSON(data,{
+        //             pane: 'POIs',
+        //             style: {color: 'red', fillOpacity: 1}
+        //         }).addTo(mymap);
+        //         break;
+
+        //     default:
+        //         geoJSONLayer = L.geoJSON(data, {}).addTo(mymap)
+        // }
+        
         let geoJSONlayer = L.geoJSON(data, {
             // Circles
             pointToLayer: function(feature, latlng){
@@ -374,6 +408,12 @@ function init(){
         geoJSONlayer.addTo(mymap)
 
 
+        // Sending the Cibinong Lake layer to the back of all other layer
+        if (layername === 'Cibinong Lake'){
+            geoJSONlayer.bringToBack()
+        }
+
+
         // Mouseover event - set hoverStyle
         geoJSONlayer.on('mouseover', function(e){
             if(e.layer instanceof L.Circle){
@@ -410,7 +450,7 @@ function init(){
             })
     }
 
-    fetchData('Data/map.geojson', 'POI')
+    fetchData('Data/map.geojson', 'POIb')
     fetchData('Data/route.geojson', 'Cibinong Route')
     fetchData('Data/Polygon_cibinong.geojson', 'Cibinong Lake')
 }
