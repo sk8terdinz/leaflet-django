@@ -316,8 +316,16 @@ function init(){
     // Function to add GeoJSON to the map
     function addGeoJSONData(data, layername){
         let geoJSONlayer = L.geoJSON(data, {
+            // Circles
             pointToLayer: function(feature, latlng){
-                return L.circle(latlng, pointStyle)
+                switch (feature.properties.name){
+                    case 'RSUD Cibinong':
+                        return L.marker(latlng)
+
+                    default:
+                        return L.circle(latlng, pointStyle)
+                }
+                
             },
 
             // filter option
@@ -325,18 +333,62 @@ function init(){
                 if (feature.properties.active === 'true'){
                     return feature
                 }
+            },
+
+            // Line styling
+            style: function(feature){
+                if (feature.geometry.type === 'LineString'){
+                    return {color: 'orange', weight:5}
+                }
+            },
+
+            // Pop for layers and style for polygons
+            onEachFeature: function(feature, layer){
+                // Style for polygons
+                if (feature.properties.name === 'Situ Cikaret'){
+                    layer.setStyle({color: 'red', fillOpacity: 1})
+                }
+
+                if (feature.properties.name === 'Situ Pemda'){
+                    layer.setStyle({color: 'blue', fillOpacity: 1})
+                }
+
+                if (feature.properties.name === 'Setu Kebantenan'){
+                    layer.setStyle({color: 'green', fillOpacity: 1})
+                }
+
+                // Popup for layers
+                if (feature.properties.name){
+                    layer.bindPopup(feature.properties.name)
+                } else {
+                    layer.bindPopup('No content to show')
+                }
             }
         })
         
-        geoJSONlayer.bindPopup(function(layer){
+        /* geoJSONlayer.bindPopup(function(layer){
             return layer.feature.properties.name
-        })
+        }) */
+
+
         geoJSONlayer.addTo(mymap)
 
+
+        // Mouseover event - set hoverStyle
         geoJSONlayer.on('mouseover', function(e){
-            e.layer.setStyle(hoverStyle)
+            if(e.layer instanceof L.Circle){
+                e.layer.setStyle(hoverStyle)
+            } 
         })
         
+        // Mouseout event - set default 
+        geoJSONlayer.on('mouseout', function(e){
+            if(e.layer instanceof L.Circle){
+                geoJSONlayer.resetStyle(e.layer)
+            } 
+        })
+
+
         layerControls.addOverlay(geoJSONlayer, layername)
     }
     // Fecth API
@@ -359,4 +411,6 @@ function init(){
     }
 
     fetchData('Data/map.geojson', 'POI')
+    fetchData('Data/route.geojson', 'Cibinong Route')
+    fetchData('Data/Polygon_cibinong.geojson', 'Cibinong Lake')
 }
